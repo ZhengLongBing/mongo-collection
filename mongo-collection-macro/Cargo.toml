@@ -1,7 +1,13 @@
 [package]
 name = "mongo-collection-macro"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+description = "Procedural macros for deriving the Collection trait for MongoDB collections"
+license = "MIT"
+repository = "https://github.com/zhenglongbing/mongo-collection"
+keywords = ["mongodb", "collection", "macro", "derive", "database"]
+categories = ["database", "development-tools::procedural-macro-helpers"]
+readme = "../README.md"
 
 [lib]
 proc-macro = true

@@ -1,0 +1,8 @@
+[package]
+name = "mongo-collection"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+mongo-collection-macro = { version = "0.1", path = "../mongo-collection-macro" }
+mongodb = { version = "3.4", features = ["dns-resolver", "rustls-tls","bson-3"] }

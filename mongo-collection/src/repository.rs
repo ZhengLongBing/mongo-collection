@@ -1,9 +1,10 @@
+use crate::list::{ListData, ListQuery};
+use crate::paginated::{PaginatedData, PaginatedQuery};
+use crate::utils::parse_object_id;
+use crate::{Collection, SortOrder};
 use async_trait::async_trait;
-use crate::Collection;
-use mongodb::bson::{doc, Document};
+use mongodb::bson::{Document, doc};
 use mongodb::options::FindOptions;
-use super::utils::parse_object_id;
-use super::models::{PaginatedQuery, PaginatedData, SortOrder};
 
 /// 通用集合仓储 Trait
 ///
@@ -67,7 +68,7 @@ where
         let collection = Self::collection(db);
         let mut cursor = match options {
             None => collection.find(filter).await?,
-            Some(options) => collection.find(filter).with_options(options).await?
+            Some(options) => collection.find(filter).with_options(options).await?,
         };
 
         let mut results = Vec::new();
@@ -80,9 +81,7 @@ where
     }
 
     /// 查找所有文档
-    async fn find_all(
-        db: &mongodb::Database,
-    ) -> Result<Vec<Self>, mongodb::error::Error> {
+    async fn find_all(db: &mongodb::Database) -> Result<Vec<Self>, mongodb::error::Error> {
         Self::find_many(db, doc! {}, None).await
     }
 
@@ -130,11 +129,39 @@ where
         })
     }
 
-    /// 统计文档数量
-    async fn count(
+    /// 列表查询（不分页）
+    async fn find_list(
         db: &mongodb::Database,
         filter: Document,
-    ) -> Result<u64, mongodb::error::Error> {
+        query: &ListQuery,
+    ) -> Result<ListData<Self>, mongodb::error::Error> {
+        let collection = Self::collection(db);
+
+        // 获取总数
+        let total_count = collection.count_documents(filter.clone()).await?;
+
+        // 构建排序选项
+        let sort_doc = if let Some(ref sort_by) = query.sort_by {
+            let sort_value = match query.sort_order {
+                SortOrder::Asc => 1,
+                SortOrder::Desc => -1,
+            };
+            doc! { sort_by: sort_value }
+        } else {
+            doc! { "_id": -1 } // 默认按 ID 降序
+        };
+
+        // 构建查询选项
+        let find_options = FindOptions::builder().sort(sort_doc).build();
+
+        // 执行查询
+        let items = Self::find_many(db, filter, Some(find_options)).await?;
+
+        Ok(ListData { items, total_count })
+    }
+
+    /// 统计文档数量
+    async fn count(db: &mongodb::Database, filter: Document) -> Result<u64, mongodb::error::Error> {
         let collection = Self::collection(db);
         collection.count_documents(filter).await
     }
@@ -158,9 +185,7 @@ where
         let collection = Self::collection(db);
         let oid = parse_object_id(id)?;
 
-        let result = collection
-            .update_one(doc! { "_id": oid }, update)
-            .await?;
+        let result = collection.update_one(doc! { "_id": oid }, update).await?;
 
         Ok(result.modified_count > 0)
     }
@@ -200,10 +225,7 @@ where
     // ========== 删除操作 ==========
 
     /// 根据 ID 删除文档
-    async fn delete_by_id(
-        db: &mongodb::Database,
-        id: &str,
-    ) -> Result<bool, mongodb::error::Error> {
+    async fn delete_by_id(db: &mongodb::Database, id: &str) -> Result<bool, mongodb::error::Error> {
         let collection = Self::collection(db);
         let oid = parse_object_id(id)?;
 

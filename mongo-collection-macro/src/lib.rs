@@ -153,9 +153,12 @@ pub fn derive_collection_repository(input: TokenStream) -> TokenStream {
     match input.data {
         Data::Struct(_) => {}
         _ => {
-            return syn::Error::new_spanned(name, "CollectionRepository can only be derived for structs")
-                .to_compile_error()
-                .into();
+            return syn::Error::new_spanned(
+                name,
+                "CollectionRepository can only be derived for structs",
+            )
+            .to_compile_error()
+            .into();
         }
     }
 

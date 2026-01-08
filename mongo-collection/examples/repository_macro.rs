@@ -35,13 +35,19 @@ fn main() {
     println!("现在可以使用以下方法：");
     println!("  - User::create(&db, &user).await              // 创建单个文档");
     println!("  - User::find_by_id(&db, \"123\").await          // 根据 ID 查找");
-    println!("  - User::find_one(&db, doc! {{ \"email\": \"test@example.com\" }}).await  // 查找单个");
+    println!(
+        "  - User::find_one(&db, doc! {{ \"email\": \"test@example.com\" }}).await  // 查找单个"
+    );
     println!("  - User::find_many(&db, doc! {{}}, None).await  // 查找多个");
     println!("  - User::find_all(&db).await                   // 查找所有");
     println!("  - User::find_paginated(&db, doc! {{}}, &query).await  // 分页查询");
     println!("  - User::count(&db, doc! {{}}).await            // 统计数量");
-    println!("  - User::exists(&db, doc! {{ \"email\": \"test@example.com\" }}).await  // 检查存在");
-    println!("  - User::update_by_id(&db, \"123\", doc! {{ \"$set\": {{ \"name\": \"新名字\" }} }}).await  // 根据 ID 更新");
+    println!(
+        "  - User::exists(&db, doc! {{ \"email\": \"test@example.com\" }}).await  // 检查存在"
+    );
+    println!(
+        "  - User::update_by_id(&db, \"123\", doc! {{ \"$set\": {{ \"name\": \"新名字\" }} }}).await  // 根据 ID 更新"
+    );
     println!("  - User::update_one(&db, filter, update).await  // 更新单个");
     println!("  - User::update_many(&db, filter, update).await // 批量更新");
     println!("  - User::delete_by_id(&db, \"123\").await        // 根据 ID 删除");

@@ -24,8 +24,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🚀 mongo-collection 完整示例\n");
 
     // 连接到 MongoDB
-    let uri = std::env::var("MONGODB_URI")
-        .unwrap_or_else(|_| "mongodb://localhost:27017".to_string());
+    let uri =
+        std::env::var("MONGODB_URI").unwrap_or_else(|_| "mongodb://localhost:27017".to_string());
 
     println!("正在连接到 MongoDB: {}", uri);
     let client = mongodb::Client::with_uri_str(&uri).await?;

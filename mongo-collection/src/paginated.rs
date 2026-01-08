@@ -3,6 +3,9 @@ use serde::{Deserialize, Serialize};
 use smart_default::SmartDefault;
 use std::collections::HashMap;
 
+#[cfg(feature = "openapi")]
+use utoipa::{IntoParams, ToSchema};
+
 /// 分页查询参数
 #[derive(Debug, Clone, SmartDefault, Deserialize)]
 #[cfg_attr(feature = "openapi", derive(ToSchema, IntoParams))]

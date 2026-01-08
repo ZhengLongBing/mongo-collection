@@ -4,6 +4,9 @@ use std::collections::HashMap;
 
 use crate::SortOrder;
 
+#[cfg(feature = "openapi")]
+use utoipa::{IntoParams, ToSchema};
+
 /// 列表查询参数
 #[derive(Debug, Clone, SmartDefault, Deserialize)]
 #[cfg_attr(feature = "openapi", derive(ToSchema, IntoParams))]

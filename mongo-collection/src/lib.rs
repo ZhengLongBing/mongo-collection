@@ -18,6 +18,7 @@ use utoipa::{IntoParams, ToSchema};
 /// 排序方向
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[cfg_attr(feature = "openapi", derive(ToSchema))]
+#[serde(rename_all = "lowercase")]
 pub enum SortOrder {
     /// 降序
     #[default]

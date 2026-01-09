@@ -1,4 +1,4 @@
-use crate::SortOrder;
+use crate::{ListQuery, SortOrder};
 use serde::{Deserialize, Serialize};
 use smart_default::SmartDefault;
 use std::collections::HashMap;
@@ -28,8 +28,31 @@ pub struct PaginatedQuery {
     /// 全局搜索关键词
     pub search: Option<String>,
     /// 字段级筛选
+    #[serde(flatten)]
     pub filters: Option<HashMap<String, String>>,
 }
+
+
+impl PaginatedQuery{
+    pub fn parsed_filters(&self)->Option<HashMap<String, String>>{
+        if let Some(ref raw_filters) = self.filters{
+            let mut filters = HashMap::new();
+            for (key, value) in raw_filters {
+                // 解析 filters[key] 格式
+                if let Some(k) = key.strip_prefix("filters[").and_then(|s| s.strip_suffix("]")) {
+                    filters.insert(k.to_string(), value.to_string());
+                }
+                // 解析 filters.key 格式
+                else if let Some(k) = key.strip_prefix("filters.") {
+                    filters.insert(k.to_string(), value.to_string());
+                }
+            }
+            return Some(filters)
+        }
+        None
+    }
+}
+
 
 impl PaginatedQuery {
     /// 计算跳过的记录数

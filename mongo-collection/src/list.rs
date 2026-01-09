@@ -12,17 +12,36 @@ use utoipa::{IntoParams, ToSchema};
 #[cfg_attr(feature = "openapi", derive(ToSchema, IntoParams))]
 #[serde(default)]
 pub struct ListQuery {
-    // 排序相关
     /// 排序字段（如 "created_at"、"name"）
     pub sort_by: Option<String>,
     /// 排序方向
     #[default(_code = "SortOrder::Desc")]
     pub sort_order: SortOrder,
-    // 搜索/筛选
     /// 全局搜索关键词
     pub search: Option<String>,
     /// 字段级筛选
+    #[serde(flatten)]
     pub filters: Option<HashMap<String, String>>,
+}
+
+impl ListQuery{
+    pub fn parsed_filters(&self)->Option<HashMap<String, String>>{
+        if let Some(ref raw_filters) = self.filters{
+            let mut filters = HashMap::new();
+            for (key, value) in raw_filters {
+                // 解析 filters[key] 格式
+                if let Some(k) = key.strip_prefix("filters[").and_then(|s| s.strip_suffix("]")) {
+                    filters.insert(k.to_string(), value.to_string());
+                }
+                // 解析 filters.key 格式
+                else if let Some(k) = key.strip_prefix("filters.") {
+                    filters.insert(k.to_string(), value.to_string());
+                }
+            }
+            return Some(filters)
+        }
+        None
+    }
 }
 
 /// 列表数据响应

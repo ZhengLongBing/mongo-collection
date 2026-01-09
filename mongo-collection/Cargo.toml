@@ -1,6 +1,6 @@
 [package]
 name = "mongo-collection"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2024"
 description = "A trait and derive macro for mapping Rust types to MongoDB collections with automatic pluralization"
 license = "MIT"
